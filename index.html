@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>Favorite Movies</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+  
+  <style type="text/css">
+    button,
+    div,
+    form,
+    input {
+      margin: 10px;
+    }
+
+  </style>
+</head>
+
+<body>
+   <div class="container">
+
+
+      <form id="movie-form" class="navbar-form navbar-right" role="search">
+      <div class="form-group">
+        <input id="movie-input" type="text" class="form-control" placeholder="Search">
+      </div>
+      <button id="add-movie" type="submit" class="btn btn-default">Add Movie</button>
+    </form>
+  </div>
+  <div class="container">
+    
+      <!-- Button triggers new movie to be added -->
+
+   
+    <h1>Movie Search</h1>
+    
+    <!-- Movies will get dumped here -->
+    <div id="movies-view"></div>
+ <!--     <div id="movie-popup" class="alert alert-warning alert-dismissible fade collapse" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button> 
+    </div> --> 
+    <div id="movies-info">
+      <div class="row">
+        <div id="movie-title" class="panel-header"></div>
+        <div id="movie-poster" class="col-sm-4"></div>    
+        <div id="spacer" class="col-sm-2"></div>
+        <div id="movie-info" class="col-sm-6"></div>
+    </div>
+    
+    <script src="http://code.jquery.com/jquery-2.1.3.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    
+    <script type="text/javascript">
+      // Initial array of movies
+      var movies = ["The Matrix", "The Notebook", "Mr. Nobody", "The Lion King"];
+      var moviesInfo = {};
+
+      function initMovieInfo () {
+        for (var i=0; i<movies.length; i++) {
+          console.log(" initializing")
+          var queryURL = "http://www.omdbapi.com/?t=" + movies[i] + "&y=&plot=short&r=json";
+          $.ajax({
+            url: queryURL, 
+            method: "GET"
+          }).done(function(response){
+              moviesInfo[response.Title] = response; 
+              renderButtons();
+          });
+        }
+        console.log(moviesInfo);
+      }
+
+function renderButtons() {
+  $("#movies-view").empty();
+  //for (var i = 0; i < movies.length; i++) {
+  // if(!initComplete) { initMovieInfo();}
+  console.log("Rendering buttons");
+  for (var key in moviesInfo) {
+      var newBtn = $("<input>");
+      newBtn.attr("value", moviesInfo[key].Title);
+      newBtn.attr("class", "btn btn- btn-primary");
+      newBtn.click(displayTitle);
+      $("#movies-view").append(newBtn);
+  }
+}
+
+      
+
+function displayTitle(){
+ 
+  var title = $(this).val();
+  console.log("showing title: " + title + moviesInfo[title]);
+  
+
+  var posterDiv = $("<img>");
+  posterDiv.attr("src", moviesInfo[title].Poster);
+  var titleDiv = $("<h3>"); 
+  titleDiv.text(moviesInfo[title].Title);
+  var plotDiv = $("<p>");
+  plotDiv.text(moviesInfo[title].Plot);
+
+
+ 
+  $("#movie-title").empty().append(titleDiv);
+  $("#movie-poster").empty().append(posterDiv);
+  $("#movie-info").empty().append(plotDiv);
+  // //  alert();
+  // $.notify({
+  //   // options
+  //   message: JSON.stringify(moviesInfo[title])
+  // },{
+  //   // settings
+  //   type: 'primary'
+  // });
+}
+
+      // This function handles events where one button is clicked
+      $("#add-movie").on("click", function() {
+        event.preventDefault();
+
+        // Here we grab the text from the input box
+        var movie = $("#movie-input").val();
+        //clear the input box
+        $("#movie-input").val("");
+        
+
+        var queryURL = "http://www.omdbapi.com/?t=" + movie + "&y=&plot=short&r=json";
+
+    
+        $.ajax({
+          url: queryURL, 
+          method: "GET"
+        }).done(function(response){
+          if (!(response.Title in moviesInfo)) {
+            //movies.push(response.Title);
+            moviesInfo[response.Title] = response;
+            console.log(moviesInfo[response.Title]);
+            renderButtons();
+          } else {
+            alert("Duplicate Movie");
+          }
+        });
+       
+      });
+
+ 
+
+      initMovieInfo();
+    
+    </script>
+  </div>
+</body>
+
+</html>
